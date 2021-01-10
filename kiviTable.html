@@ -5,7 +5,16 @@
         table, td {
             border: 1px solid black;
         }
-        td{
+        .gameBoard{
+            margin: 10px;
+        }
+        .scoreTable{
+            margin: 5px;
+        }
+        .scoreCell{
+            padding: 5px;
+        }
+        .gameBoardCell{
             width: 110px;
             height: 110px;
             text-align: center;
@@ -24,6 +33,32 @@
         .selectedButton{
             background-color: green;
         }
+        .hLineCell {
+            background-color: orange;
+            text-align: center;
+            font-size: 80px;
+        }
+        .vLineCell {
+            background-color: yellow;
+            text-align: center;
+            font-size: 80px;
+        }
+        .indiCell {
+            background-color: green;
+            text-align: center;
+            font-size: 80px;
+        }
+        .hvLineCell {
+            background: repeating-linear-gradient(
+                    45deg,
+                    yellow,
+                    yellow 10px,
+                    orange 10px,
+                    orange 20px
+            );
+            text-align: center;
+            font-size: 80px;
+        }
     </style>
     <meta charset="UTF-8">
     <title>KiviTable</title>
@@ -34,6 +69,7 @@
     <div id="buttDiv" style="float: left">
         <div id="playerButtDiv"></div>
         <div id="scoreButtDiv"></div>
+        <div id="scoreTableDiv"></div>
     </div>
 </div>
 <script src="tableGenerate.js"></script>

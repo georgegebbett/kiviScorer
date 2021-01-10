@@ -6,6 +6,7 @@ var numberOfPlayers = 2;
 var selectedPlayer = 1;
 
 var buttonsAdded = false;
+var scoreTableAdded = false;
 
 document.body.onload = createTable;
 
@@ -14,6 +15,7 @@ function createTable(){
     //var gameBoard = document.getElementById("myTable");
     var gameBoard = document.createElement("TABLE");
     gameBoard.id = "gameBoard";
+    gameBoard.classList.add("gameBoard");
     document.getElementById("tableDiv").insertAdjacentElement("beforeend",gameBoard);
 
     var cellNo = 49;
@@ -25,15 +27,16 @@ function createTable(){
             //thisCell.innerText = cellNo;
             thisCell.id = "cell".concat(cellNo);
             thisCell.setAttribute("cellId", cellNo);
+            thisCell.classList.add("gameBoardCell")
             thisCell.addEventListener('click', cellClick);
             if (pinkCellList.includes(cellNo)){
-                thisCell.className = "pink";
+                thisCell.classList.add("pink");
                 thisCell.setAttribute("scoreValue", 3);
             } else if (whiteCellList.includes(cellNo)){
-                thisCell.className = "white";
+                thisCell.classList.add("white");
                 thisCell.setAttribute("scoreValue", 1);
             } else {
-                thisCell.className = "black";
+                thisCell.classList.add("black");
                 thisCell.setAttribute("scoreValue", 2);
             }
             thisCell.setAttribute("occupiedBy", "");
@@ -43,6 +46,37 @@ function createTable(){
     if (!buttonsAdded){
         addButtons();
     }
+
+    if (!scoreTableAdded){
+        addScoreTable();
+    }
+}
+
+function addScoreTable(){
+    var scoreTable = document.createElement("TABLE");
+    scoreTable.classList.add("scoreTable");
+    scoreTable.id = "scoreTable";
+    document.getElementById("scoreTableDiv").insertAdjacentElement("beforeend",scoreTable);
+    scoreTable = document.getElementById("scoreTable");
+
+    for (var rows = 0; rows < 5; rows++){
+        var currentRow = scoreTable.insertRow(0);
+        for (var col = 0; col <= numberOfPlayers; col++){
+            currentCell = currentRow.insertCell(0);
+            currentCell.classList.add("scoreCell");
+        }
+    }
+
+    for (var col = 1; col <= numberOfPlayers; col++){
+        scoreTable.rows[0].cells[col].innerText = "Player ".concat(col);
+    }
+
+    scoreTable.rows[1].cells[0].innerText = "Horizontal lines"
+    scoreTable.rows[2].cells[0].innerText = "Vertical lines"
+    scoreTable.rows[3].cells[0].innerText = "Individual squares"
+    scoreTable.rows[4].cells[0].innerText = "Total"
+
+    scoreTableAdded = true;
 }
 
 function addButtons(){
@@ -109,18 +143,63 @@ function playerButtonClick(passedMouseEvent){
 }
 
 function scoreButtonClick(){
-    findHorizontalLines();
-    findVerticalLines();
-    console.log(findIndividualSquares());
+    var scoreTable = document.getElementById("scoreTable");
+
+    for (var i = 0; i < 50; i++){
+        console.log("");
+    }
+    var hLineScores = (scoreLines(processHlines(findHorizontalLines())));
+    var vLineScores = (scoreLines(processVLines(findVerticalLines())));
+    var squareScores = (findIndividualSquares());
+
+    console.log(hLineScores);
+    console.log(vLineScores);
+    console.log(squareScores);
+
+    if (hLineScores == undefined){
+        hLineScores = {player1Score: 0, player2Score: 0, player3Score: 0, player4Score: 0};
+    }
+
+    if (vLineScores == undefined){
+        vLineScores = {player1Score: 0, player2Score: 0, player3Score: 0, player4Score: 0};
+    }
+
+    var p1Score = hLineScores.player1Score + vLineScores.player1Score + squareScores.player1Score;
+    var p2Score = hLineScores.player2Score + vLineScores.player2Score + squareScores.player2Score;
+    var p3Score = hLineScores.player3Score + vLineScores.player3Score + squareScores.player3Score;
+    var p4Score = hLineScores.player4Score + vLineScores.player4Score + squareScores.player4Score;
+
+
+    scoreTable.rows[1].cells[1].innerText = hLineScores.player1Score;
+    scoreTable.rows[2].cells[1].innerText = vLineScores.player1Score;
+    scoreTable.rows[3].cells[1].innerText = squareScores.player1Score;
+    scoreTable.rows[4].cells[1].innerText = p1Score;
+
+    scoreTable.rows[1].cells[2].innerText = hLineScores.player2Score;
+    scoreTable.rows[2].cells[2].innerText = vLineScores.player2Score;
+    scoreTable.rows[3].cells[2].innerText = squareScores.player2Score;
+    scoreTable.rows[4].cells[2].innerText = p2Score;
+
+
+
+
+    console.log(p1Score);
 
 
 }
 
 function resetButtonClick(){
-    for (tableRow of document.getElementById("gameBoard").rows){
+    /*for (tableRow of document.getElementById("gameBoard").rows){
         for (rowCell of tableRow.cells){
             rowCell.innerText = "";
             rowCell.setAttribute("occupiedBy", "");
+        }
+    }*/
+
+    var scoreTable = document.getElementById("scoreTable");
+    for (var i = 1; i < 5; i++){
+        for (var col = 1; col <= numberOfPlayers; col++){
+            scoreTable.rows[i].cells[col].innerText = "0";
         }
     }
 
@@ -131,42 +210,72 @@ function resetButtonClick(){
 
 function findHorizontalLines(){
     console.log("looking for h lines");
-    var hLineArray = [];
+    var hLineCells = [];
     for (tableRow of document.getElementById("gameBoard").rows){
+        var hLineRowCells = [];
         for (var col = 0; col < 7; col++){
             if (tableRow.cells[col].getAttribute("occupiedBy") !== ""){
                 if (col !== 6){
                     if (tableRow.cells[col].innerText === tableRow.cells[col+1].innerText || tableRow.cells[col].innerText === tableRow.cells[col-1].innerText){
-                        tableRow.cells[col].style.backgroundColor = "yellow";
+                        tableRow.cells[col].className = "hLineCell";
+                        hLineRowCells.push(parseInt(tableRow.cells[col].getAttribute("cellId")));
                     }
                 } else {
                     if (tableRow.cells[col].innerText === tableRow.cells[col-1].innerText){
-                        tableRow.cells[col].style.backgroundColor = "yellow";
+                        tableRow.cells[col].className = "hLineCell";
+                        hLineRowCells.push(parseInt(tableRow.cells[col].getAttribute("cellId")));
                     }
                 }
             }
         }
+        if (hLineRowCells.length !==0){
+            hLineCells.push(hLineRowCells);
+        }
     }
+    return hLineCells;
 }
 
-function findVerticalLines(){
+function findVerticalLines() {
     console.log("looking for v lines");
+    var vLineCells = [];
     var gameTable = document.getElementById("gameBoard");
-    for (var row = 0; row < 7; row++){
-        for (var col = 0; col < 7; col++){
-            if (gameTable.rows[row].cells[col].getAttribute("occupiedBy") !== ""){
-                if (row !== 6){
-                    if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row+1].cells[col].innerText || gameTable.rows[row].cells[col].innerText === gameTable.rows[row-1].cells[col].innerText){
-                        gameTable.rows[row].cells[col].style.backgroundColor = "orange";
+    for (var row = 0; row < 7; row++) {
+        var vLineRowCells = [];
+        for (var col = 0; col < 7; col++) {
+            if (gameTable.rows[row].cells[col].getAttribute("occupiedBy") !== "") {
+                if (row !== 6) {
+                    if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row + 1].cells[col].innerText || gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
+                        if (gameTable.rows[row].cells[col].className !== "hLineCell") {
+                            gameTable.rows[row].cells[col].className = "vLineCell";
+                        } else {
+                            gameTable.rows[row].cells[col].className = "hvLineCell";
+                        }
+                        vLineRowCells.push(parseInt(gameTable.rows[row].cells[col].getAttribute("cellId")));
+                    } else {
+                        vLineRowCells.push("x");
                     }
                 } else {
-                    if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row-1].cells[col].innerText){
-                        gameTable.rows[row].cells[col].style.backgroundColor = "orange";
+                    if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
+                        if (gameTable.rows[row].cells[col].className !== "hLineCell") {
+                            gameTable.rows[row].cells[col].className = "vLineCell";
+                        } else {
+                            gameTable.rows[row].cells[col].className = "hvLineCell";
+                        }
+                        vLineRowCells.push(parseInt(gameTable.rows[row].cells[col].getAttribute("cellId")));
+                    } else {
+                        vLineRowCells.push("x");
+
                     }
                 }
+            } else {
+                vLineRowCells.push("x");
             }
         }
+        if (vLineRowCells.length !== 0) {
+            vLineCells.push(vLineRowCells);
+        }
     }
+    return vLineCells;
 }
 
 function findIndividualSquares() {
@@ -176,11 +285,12 @@ function findIndividualSquares() {
         player3Score: 0,
         player4Score: 0
     }
+    console.log("looking for individual squares");
     for (tableRow of document.getElementById("gameBoard").rows) {
-        for (tableCell of tableRow.cells){
-            if (tableCell.style.backgroundColor !== "orange" && tableCell.style.backgroundColor !== "yellow"){
+        for (tableCell of tableRow.cells) {
+            if (tableCell.className !== "hLineCell" && tableCell.className !== "vLineCell" && tableCell.className !== "hvLineCell") {
                 if (tableCell.getAttribute("occupiedBy") !== "") {
-                    tableCell.style.backgroundColor = "green";
+                    tableCell.className = "indiCell";
                     if (tableCell.getAttribute("occupiedBy") === "1") {
                         scores.player1Score = scores.player1Score + parseInt(tableCell.getAttribute("scoreValue"));
                     } else if (tableCell.getAttribute("occupiedBy") === "2") {
@@ -194,5 +304,101 @@ function findIndividualSquares() {
             }
         }
     }
+    return scores;
+}
+
+function processHlines(hLineArrays) {
+    var allLines = [];
+    for (var hlineArray of hLineArrays){
+        var currentLine = [];
+        for (var arrayItem = 1; arrayItem < hlineArray.length; arrayItem++){
+            var thisItem = parseInt(hlineArray[arrayItem]);
+            var lastItem = parseInt(hlineArray[arrayItem-1]);
+            if (document.getElementById("cell".concat(thisItem)).getAttribute("occupiedBy") !== document.getElementById("cell".concat(lastItem)).getAttribute("occupiedBy")) {
+                allLines.push(currentLine);
+                currentLine = [];
+                currentLine.push(hlineArray[arrayItem]);
+                continue;
+            }
+            if (thisItem === lastItem+1){
+                if (currentLine.length === 0){
+                    currentLine.push(lastItem);
+                }
+                currentLine.push(thisItem);
+            } else {
+                allLines.push(currentLine);
+                currentLine = [];
+                currentLine.push(hlineArray[arrayItem]);
+            }
+            if (arrayItem === hlineArray.length-1){
+                allLines.push(currentLine);
+                currentLine = [];
+                currentLine.push(hlineArray[arrayItem]);
+            }
+        }
+    }
+    return allLines;
+}
+
+function processVLines(vLineArrays){
+    var allLines = [];
+    for (var i = 0; i < 7; i++){
+        var currentLine = [];
+        for (var i2 = 0; i2 < 7; i2++){
+            if (vLineArrays[i2][i] !== "x"){
+                if (i2 !== 0 && vLineArrays[i2-1][i] !== "x"){
+                    if (document.getElementById("cell".concat(vLineArrays[i2][i])).getAttribute("occupiedBy") !== document.getElementById("cell".concat(vLineArrays[i2-1][i])).getAttribute("occupiedBy")){
+                        allLines.push(currentLine);
+                        currentLine = [];
+                        currentLine.push(vLineArrays[i2][i]);
+                        continue;
+                    }
+                }
+                currentLine.push(vLineArrays[i2][i]);
+            }
+        }
+        if (currentLine.length !== 0){
+            allLines.push(currentLine);
+        }
+    }
+    return allLines;
+}
+
+function scoreLines(linesAsArray){
+
+    for (var innerArray = 0; innerArray < linesAsArray.length; innerArray++){
+        if (linesAsArray[innerArray].length < 2){
+            linesAsArray.splice(innerArray);
+        }
+    }
+
+    if (linesAsArray.length === 0){
+        return;
+    }
+    var scores = {
+        player1Score: 0,
+        player2Score: 0,
+        player3Score: 0,
+        player4Score: 0
+    }
+    for (var line of linesAsArray){
+        var score = 0;
+        console.log(line);
+        var player = document.getElementById("cell".concat(line[0])).getAttribute("occupiedBy");
+        for (var lineItem of line){
+            score = score + parseInt(document.getElementById("cell".concat(lineItem)).getAttribute("scoreValue"));
+        }
+        score = score * line.length;
+        if (player === "1") {
+            scores.player1Score = scores.player1Score + score;
+        } else if (player === "2") {
+            scores.player2Score = scores.player2Score + score;
+        } else if (player === "3") {
+            scores.player3Score = scores.player3Score + score;
+        } else if (player === "4") {
+            scores.player4Score = scores.player4Score + score;
+        }
+    }
+    console.log(scores);
     return scores;
 }
