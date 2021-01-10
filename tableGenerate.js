@@ -112,6 +112,13 @@ function addButtons(){
     resetButton.className = "resetButton";
     resetButton.addEventListener('click', resetButtonClick);
 
+    var listButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', listButton);
+    listButton.innerText = "To List";
+    listButton.id = "listButton";
+    listButton.className = "resetButton";
+    listButton.addEventListener('click', listButtonClick);
+
     buttonsAdded = true;
 
 }
@@ -133,6 +140,20 @@ function cellClick(passedMouseEvent){
         }
     }
 }
+
+function listButtonClick(){
+    var tableList = [];
+    gameTable = document.getElementById("gameBoard");
+    for (var tableRow of gameTable.rows){
+        var rowList = [];
+        for (var tableCell of tableRow.cells){
+            rowList.push(tableCell.getAttribute("occupiedBy"));
+        }
+        tableList.push(rowList);
+    }
+    console.log(tableList);
+}
+
 
 function playerButtonClick(passedMouseEvent){
     selectedPlayer = passedMouseEvent.target.attributes.playerID.nodeValue;
