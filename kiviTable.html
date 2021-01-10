@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table, td {
+            border: 1px solid black;
+        }
+        td{
+            width: 110px;
+            height: 110px;
+            text-align: center;
+            font-size: 80px;
+        }
+        .pink {
+            background-color: deeppink;
+        }
+        .black {
+            background-color: black;
+            color: white;
+        }
+        button {
+            margin: 5px;
+        }
+        .selectedButton{
+            background-color: green;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>KiviTable</title>
+</head>
+<body>
+<div id="wrapperDiv" style="overflow: hidden">
+    <div id="tableDiv" style="float: left"></div>
+    <div id="buttDiv" style="float: left">
+        <div id="playerButtDiv"></div>
+        <div id="scoreButtDiv"></div>
+    </div>
+</div>
+<script src="tableGenerate.js"></script>
+</body>
+</html>
