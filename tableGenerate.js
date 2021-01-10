@@ -117,7 +117,8 @@ function addButtons(){
 }
 
 function cellClick(passedMouseEvent){
-    var clickedCell = passedMouseEvent.path[0];
+    console.log(passedMouseEvent);
+    var clickedCell = passedMouseEvent.target;
 
     if (clickedCell.innerText === ""){
         clickedCell.innerText = selectedPlayer;
@@ -134,11 +135,11 @@ function cellClick(passedMouseEvent){
 }
 
 function playerButtonClick(passedMouseEvent){
-    selectedPlayer = passedMouseEvent.path[0].attributes.playerID.nodeValue;
+    selectedPlayer = passedMouseEvent.target.attributes.playerID.nodeValue;
     for (button of document.getElementsByClassName("playerButton")){
         button.className = "playerButton"
     }
-    passedMouseEvent.path[0].classList.add("selectedButton");
+    passedMouseEvent.target.classList.add("selectedButton");
 
 }
 
