@@ -46,13 +46,13 @@ function createTable(){
             thisCell.addEventListener('click', cellClick);
             if (pinkCellList.includes(cellNo)){
                 thisCell.classList.add("pink");
-                thisCell.setAttribute("scoreValue", 3);
+                thisCell.setAttribute("scoreValue", "3");
             } else if (whiteCellList.includes(cellNo)){
                 thisCell.classList.add("white");
-                thisCell.setAttribute("scoreValue", 1);
+                thisCell.setAttribute("scoreValue", "1");
             } else {
                 thisCell.classList.add("black");
-                thisCell.setAttribute("scoreValue", 2);
+                thisCell.setAttribute("scoreValue", "2");
             }
             thisCell.setAttribute("occupiedBy", "");
             cellNo = cellNo - 1;
@@ -77,7 +77,7 @@ function addScoreTable(){
     for (var rows = 0; rows < 5; rows++){
         var currentRow = scoreTable.insertRow(0);
         for (var col = 0; col <= numberOfPlayers; col++){
-            currentCell = currentRow.insertCell(0);
+            let currentCell = currentRow.insertCell(0);
             currentCell.classList.add("scoreCell");
         }
     }
@@ -161,8 +161,8 @@ function resizeButtonClick(){
 
     ipadMode = true;
 
-    for (row of rowList){
-        for (cell of row.cells){
+    for (var row of rowList){
+        for (var cell of row.cells){
             cell.classList.remove("gameBoardCell");
             cell.classList.add("iPadGameBoardCell");
         }
@@ -257,7 +257,7 @@ function scoreButtonClick(){
     var scoreTable = document.getElementById("scoreTable");
 
 
-    if (player1Cells !== 10 | player2Cells !== 10){
+    if (player1Cells !== 10 || player2Cells !== 10){
         scoreTable.rows[0].cells[0].innerText = "Tokens Missing!";
         scoreTable.rows[0].cells[0].style.color = "red";
     } else {
