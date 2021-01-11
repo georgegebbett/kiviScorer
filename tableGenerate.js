@@ -227,6 +227,16 @@ function playerButtonClick(passedMouseEvent){
 function scoreButtonClick(){
     var scoreTable = document.getElementById("scoreTable");
 
+
+    if (player1Cells !== 10 | player2Cells !== 10){
+        scoreTable.rows[0].cells[0].innerText = "Tokens Missing!";
+        scoreTable.rows[0].cells[0].style.color = "red";
+    } else {
+        scoreTable.rows[0].cells[0].innerText = "All tokens placed";
+        scoreTable.rows[0].cells[0].style.color = "green";
+    }
+
+
     for (var i = 0; i < 50; i++){
         console.log("");
     }
@@ -287,6 +297,8 @@ function resetButtonClick(){
 
     document.getElementById("gameBoard").remove();
     createTable();
+    document.getElementById("scoreTable").rows[0].cells[0].innerText = "";
+
 
     player1Cells = 0;
     player2Cells = 0;
