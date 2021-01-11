@@ -5,6 +5,10 @@ var numberOfPlayers = 2;
 
 var selectedPlayer = 1;
 
+var player1Cells = 0;
+var player2Cells = 0;
+var cellLimit = 10;
+
 var buttonsAdded = false;
 var scoreTableAdded = false;
 
@@ -160,17 +164,32 @@ function cellClick(passedMouseEvent){
     var clickedCell = passedMouseEvent.target;
 
     if (clickedCell.innerText === ""){
-        clickedCell.innerText = selectedPlayer;
-        clickedCell.setAttribute("occupiedBy", selectedPlayer);
-    } else {
-        if (clickedCell.innerText === selectedPlayer.toString()){
-            clickedCell.innerText = "";
-            clickedCell.setAttribute("occupiedBy", "");
-        } else {
+        if (eval("player" + selectedPlayer +"Cells") < cellLimit){
             clickedCell.innerText = selectedPlayer;
+            console.log(eval("player" + selectedPlayer +"Cells"));
+            eval("player" + selectedPlayer +"Cells++");
             clickedCell.setAttribute("occupiedBy", selectedPlayer);
+        } else {
+            alert("You can only select " + cellLimit + " cells!");
+        }
+    } else if (clickedCell.innerText === selectedPlayer.toString()){
+        clickedCell.innerText = "";
+        eval("player" + selectedPlayer +"Cells--");
+        clickedCell.setAttribute("occupiedBy", "");
+    } else {
+        if (eval("player" + selectedPlayer +"Cells") < cellLimit) {
+            eval("player" + clickedCell.innerText +"Cells--");
+            clickedCell.innerText = selectedPlayer;
+            eval("player" + selectedPlayer +"Cells++");
+            clickedCell.setAttribute("occupiedBy", selectedPlayer);
+        } else {
+            alert("You can only select " + cellLimit + " cells!");
         }
     }
+
+    console.log("player one has", player1Cells);
+    console.log("player two has", player2Cells);
+
 
     if (autoScore){
 
@@ -268,6 +287,9 @@ function resetButtonClick(){
 
     document.getElementById("gameBoard").remove();
     createTable();
+
+    player1Cells = 0;
+    player2Cells = 0;
 
 }
 
