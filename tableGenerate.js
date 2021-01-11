@@ -10,6 +10,58 @@ var scoreTableAdded = false;
 
 document.body.onload = createTable;
 
+class Cell {
+    constructor(occupiedBy, pointsValue, cellId) {
+        this.occupiedBy = parseInt(occupiedBy);
+        this.pointsValue = parseInt(pointsValue);
+        this.cellId = parseInt(cellId) - 1;
+    }
+
+    getOccupiedBy() {
+        return this.occupiedBy.toString();
+    }
+
+    setOccupiedBy(val) {
+        let temp = parseInt(val);
+        if (temp >= 0 && temp <= 4) {
+            this.occupiedBy = temp;
+        } else {
+            // Scream loudly
+        }
+    }
+
+    isOccupiedBy(player) {
+        return parseInt(player) === this.occupiedBy;
+    }
+
+    isPartOfLine(board) {
+        let y = Math.floor(this.cellId / board.length);
+        let x = this.cellId % board.length;
+        let horiz = false;
+        let vert = false;
+
+        if (x > 0)
+            horiz |= board[y][x - 1].getOccupiedBy() === this.getOccupiedBy();
+        if (x < board.length)
+            horiz |= board[y][x + 1].getOccupiedBy() === this.getOccupiedBy();
+
+        if (y > 0)
+            vert |= board[y - 1][x].getOccupiedBy() === this.getOccupiedBy();
+        if (y < board.length)
+            vert |= board[y + 1][x].getOccupiedBy() === this.getOccupiedBy();
+
+        if (horiz && vert) {
+            return "count both";
+        } else if (horiz) {
+            return "horizontal";
+        } else if (vert) {
+            return "vertical";
+        } else {
+            return "lonely";
+        }
+    }
+}
+
 
 function createTable(){
     //var gameBoard = document.getElementById("myTable");
@@ -39,7 +91,7 @@ function createTable(){
                 thisCell.classList.add("black");
                 thisCell.setAttribute("scoreValue", 2);
             }
-            thisCell.setAttribute("occupiedBy", "");
+            thisCell.setAttribute("occupiedBy", 0);
             cellNo = cellNo - 1;
         }
     }
@@ -119,12 +171,19 @@ function addButtons(){
     listButton.className = "resetButton";
     listButton.addEventListener('click', listButtonClick);
 
+    var listScoreButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', listScoreButton);
+    listScoreButton.innerText = "Score List";
+    listScoreButton.id = "listScoreButton";
+    listScoreButton.className = "resetButton";
+    listScoreButton.addEventListener('click', listScore);
+
     buttonsAdded = true;
 
 }
 
 function cellClick(passedMouseEvent){
-    console.log(passedMouseEvent);
+    //console.log(passedMouseEvent);
     var clickedCell = passedMouseEvent.target;
 
     if (clickedCell.innerText === ""){
@@ -147,11 +206,64 @@ function listButtonClick(){
     for (var tableRow of gameTable.rows){
         var rowList = [];
         for (var tableCell of tableRow.cells){
-            rowList.push(tableCell.getAttribute("occupiedBy"));
+            rowList.push(new Cell(tableCell.getAttribute("occupiedBy"), tableCell.getAttribute("scoreValue"), tableCell.getAttribute("cellId")));
         }
         tableList.push(rowList);
     }
     console.log(tableList);
+    return tableList;
+}
+
+function listScore(){
+    function getScoreForPlayer(board, player) {
+        if (player > numberOfPlayers) return 0;
+
+        let totalScore = 0;
+
+        for (let i = 0; i < board.length; i++) {
+            let totalRowScore = 0;
+            let totalColumnScore = 0;
+            let currentRowScore = 0;
+            let currentRowLength = 0;
+            let currentColumnScore = 0;
+            let currentColumnLength = 0;
+
+            for (let j = 0; j < board.length; j++) {
+                if (board[i][j].isOccupiedBy(player)) {
+                    currentRowScore += board[i][j].pointsValue;
+                    currentRowLength++;
+                } else {
+                    totalRowScore += currentRowScore * currentRowLength;
+                    currentRowScore = 0;
+                    currentRowLength = 0;
+                }
+
+                if (board[j][i].isOccupiedBy(player)) {
+                    currentColumnScore += board[j][i].pointsValue;
+                    currentColumnLength++;
+                } else {
+                    totalColumnScore += currentColumnScore * currentColumnLength;
+                    currentColumnScore = 0;
+                    currentColumnLength = 0;
+                }
+            }
+            totalRowScore += currentRowLength * currentRowScore;
+            totalColumnScore += currentColumnLength * currentColumnScore;
+
+            console.log("Total for row " + i + ": " + totalRowScore);
+            console.log("Total for column " + i + ": " + totalColumnScore);
+        }
+        console.log(totalScore);
+        return totalScore;
+    }
+
+    var tableList = listButtonClick();
+    return {
+        player1Score: getScoreForPlayer(tableList, 1),
+        player2Score: getScoreForPlayer(tableList, 2),
+        player3Score: getScoreForPlayer(tableList, 3),
+        player4Score: getScoreForPlayer(tableList, 4)
+    };
 }
 
 
@@ -211,20 +323,12 @@ function scoreButtonClick(){
 }
 
 function resetButtonClick(){
-    /*for (tableRow of document.getElementById("gameBoard").rows){
-        for (rowCell of tableRow.cells){
-            rowCell.innerText = "";
-            rowCell.setAttribute("occupiedBy", "");
-        }
-    }*/
-
     var scoreTable = document.getElementById("scoreTable");
     for (var i = 1; i < 5; i++){
         for (var col = 1; col <= numberOfPlayers; col++){
             scoreTable.rows[i].cells[col].innerText = "0";
         }
     }
-
     document.getElementById("gameBoard").remove();
     createTable();
 
