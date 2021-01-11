@@ -316,7 +316,10 @@ function cellClick(passedMouseEvent){
 function playerButtonClick(passedMouseEvent){
     selectedPlayer = passedMouseEvent.target.attributes.playerID.nodeValue;
     for (button of document.getElementsByClassName("playerButton")){
-        button.className = "playerButton"
+        button.className = "playerButton";
+        if (phoneMode){
+            button.classList.add("phoneButton");
+        }
     }
     passedMouseEvent.target.classList.add("selectedButton");
 
