@@ -8,6 +8,8 @@ var selectedPlayer = 1;
 var buttonsAdded = false;
 var scoreTableAdded = false;
 
+var autoScore = false;
+
 document.body.onload = createTable;
 
 
@@ -29,6 +31,8 @@ function createTable(){
             thisCell.setAttribute("cellId", cellNo);
             thisCell.setAttribute("inHLine", "false");
             thisCell.setAttribute("inVLine", "false");
+            thisCell.setAttribute("inHVLine", "false");
+
             thisCell.classList.add("gameBoardCell")
             thisCell.addEventListener('click', cellClick);
             if (pinkCellList.includes(cellNo)){
@@ -114,8 +118,41 @@ function addButtons(){
     resetButton.className = "resetButton";
     resetButton.addEventListener('click', resetButtonClick);
 
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', lineBreak);
+
+    var manScoreButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', manScoreButton);
+    manScoreButton.innerText = "Manual Scoring";
+    manScoreButton.id = "manScoreButton";
+    manScoreButton.className = "resetButton";
+    manScoreButton.classList.add("selectedButton");
+    manScoreButton.addEventListener('click', autoScoreButtonClick);
+
+    var autoScoreButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', autoScoreButton);
+    autoScoreButton.innerText = "Automatic Scoring";
+    autoScoreButton.id = "autoScoreButton";
+    autoScoreButton.className = "resetButton";
+    autoScoreButton.addEventListener('click', autoScoreButtonClick);
+
     buttonsAdded = true;
 
+}
+
+function autoScoreButtonClick(passedMouseEvent){
+    if (passedMouseEvent.target.id === "manScoreButton"){
+        autoScore = false;
+        document.getElementById("scoreButton").disabled = false;
+    } else {
+        autoScore = true;
+        document.getElementById("scoreButton").disabled = true;
+    }
+
+    for (button of document.getElementsByClassName("resetButton")){
+        button.classList.remove("selectedButton");
+    }
+
+    passedMouseEvent.target.classList.add("selectedButton");
 }
 
 function cellClick(passedMouseEvent){
@@ -133,6 +170,29 @@ function cellClick(passedMouseEvent){
             clickedCell.innerText = selectedPlayer;
             clickedCell.setAttribute("occupiedBy", selectedPlayer);
         }
+    }
+
+    if (autoScore){
+
+        var allRows = document.getElementById("gameBoard").rows
+
+        for (row of allRows){
+            for (cell of row.cells){
+
+                cell.classList.remove("indiCell");
+                cell.classList.remove("hLineCell");
+                cell.classList.remove("vLineCell");
+                cell.classList.remove("hvLineCell");
+                cell.setAttribute("inHLine", "false");
+                cell.setAttribute("inVLine", "false");
+                cell.setAttribute("inHVLine", "false");
+            }
+
+        }
+
+
+        scoreButtonClick();
+
     }
 }
 
@@ -218,6 +278,7 @@ function findHorizontalLines(){
         var hLineRowCells = [];
         for (var col = 0; col < 7; col++){
             if (tableRow.cells[col].getAttribute("occupiedBy") !== ""){
+                tableRow.cells[col].classList.remove("indiCell");
                 if (0 < col && col < 6){
                     if (tableRow.cells[col].innerText === tableRow.cells[col+1].innerText || tableRow.cells[col].innerText === tableRow.cells[col-1].innerText){
                         tableRow.cells[col].classList.add("hLineCell");
@@ -259,6 +320,7 @@ function findVerticalLines() {
                     if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row + 1].cells[col].innerText || gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
                         if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
                             gameTable.rows[row].cells[col].classList.add("hvLineCell");
+                            gameTable.rows[row].cells[col].setAttribute("inHVLine", "true");
                         } else {
                             gameTable.rows[row].cells[col].classList.add("vLineCell");
                         }
@@ -271,6 +333,8 @@ function findVerticalLines() {
                     if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
                         if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
                             gameTable.rows[row].cells[col].classList.add("hvLineCell");
+                            gameTable.rows[row].cells[col].setAttribute("inHVLine", "true");
+
                         } else {
                             gameTable.rows[row].cells[col].classList.add("vLineCell");
                         }
@@ -284,6 +348,8 @@ function findVerticalLines() {
                     if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row + 1].cells[col].innerText) {
                         if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
                             gameTable.rows[row].cells[col].classList.add("hvLineCell");
+                            gameTable.rows[row].cells[col].setAttribute("inHVLine", "true");
+
                         } else {
                             gameTable.rows[row].cells[col].classList.add("vLineCell");
                         }
@@ -364,6 +430,18 @@ function processHlines(hLineArrays) {
             }
         }
     }
+   /* for (line of allLines){
+        console.log(line);
+        for (var cell = 0; cell < line.length; cell++){
+            if (cell === 0){
+                document.getElementById("cell".concat(line[cell])).classList.add("hLineLeftCell");
+            } else if (cell === line.length-1){
+                document.getElementById("cell".concat(line[cell])).classList.add("hLineRightCell");
+            } else {
+                document.getElementById("cell".concat(line[cell])).classList.add("hLineMidCell");
+            }
+        }
+    }*/
     return allLines;
 }
 
@@ -389,6 +467,22 @@ function processVLines(vLineArrays){
             allLines.push(currentLine);
         }
     }
+    /*for (line of allLines){
+        console.log(line);
+        for (var cell = 0; cell < line.length; cell++){
+            if (document.getElementById("cell".concat(line[cell])).getAttribute("inHVLine") !== "true"){
+                if (cell === 0){
+                    document.getElementById("cell".concat(line[cell])).classList.add("vLineTopCell");
+                } else if (cell === line.length-1){
+                    document.getElementById("cell".concat(line[cell])).classList.add("vLineBottomCell");
+                } else {
+                    document.getElementById("cell".concat(line[cell])).classList.add("vLineMidCell");
+                }
+            } else {
+                document.getElementById("cell".concat(line[cell])).classList.remove("hLineMidCell");
+            }
+        }
+    }*/
     return allLines;
 }
 
