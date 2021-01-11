@@ -100,8 +100,7 @@ function addButtons(){
         currentButton.setAttribute("playerID", i);
         currentButton.addEventListener('click', playerButtonClick);
         if (i % 2 === 0){
-            var lineBreak = document.createElement("br");
-            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', lineBreak);
+            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', document.createElement("br"));
 
         }
     }
@@ -122,7 +121,7 @@ function addButtons(){
     resetButton.className = "resetButton";
     resetButton.addEventListener('click', resetButtonClick);
 
-    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', lineBreak);
+    document.getElementById("resetButton").insertAdjacentElement('afterend', document.createElement("br"));
 
     var manScoreButton = document.createElement("button");
     document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', manScoreButton);
@@ -139,7 +138,30 @@ function addButtons(){
     autoScoreButton.className = "resetButton";
     autoScoreButton.addEventListener('click', autoScoreButtonClick);
 
+    document.getElementById("autoScoreButton").insertAdjacentElement('afterend', document.createElement("br"));
+
+    var resizeButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', resizeButton);
+    resizeButton.innerText = "Resize for iPad";
+    resizeButton.id = "resizeButton";
+    resizeButton.className = "resetButton";
+    resizeButton.addEventListener('click', resizeButtonClick);
+
     buttonsAdded = true;
+
+}
+
+function resizeButtonClick(){
+    var rowList = document.getElementById("gameBoard").rows;
+
+    for (row of rowList){
+        for (cell of row.cells){
+            cell.classList.remove("gameBoardCell");
+            cell.classList.add("iPadGameBoardCell");
+        }
+    }
+
+    document.getElementById("resizeButton").remove();
 
 }
 
