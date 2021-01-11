@@ -14,6 +14,7 @@ var scoreTableAdded = false;
 
 var autoScore = false;
 var ipadMode = false;
+var phoneMode = false;
 
 document.body.onload = createTable;
 
@@ -40,6 +41,8 @@ function createTable(){
 
             if (ipadMode){
                 thisCell.classList.add("iPadGameBoardCell");
+            } else if (phoneMode){
+                thisCell.classList.add("phoneGameBoardCell");
             } else {
                 thisCell.classList.add("gameBoardCell");
             }
@@ -96,6 +99,12 @@ function addScoreTable(){
 
 function addButtons(){
 
+    function createLineBreak() {
+        var lineBreak = document.createElement("br");
+        lineBreak.className = "settingsLineBreak";
+        return lineBreak;
+    }
+
     for (var i = 1; i <= numberOfPlayers; i++){
         var playerButton = document.createElement("button");
         var currentButton = document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', playerButton);
@@ -105,7 +114,7 @@ function addButtons(){
         currentButton.setAttribute("playerID", i);
         currentButton.addEventListener('click', playerButtonClick);
         if (i % 2 === 0){
-            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', document.createElement("br"));
+            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', createLineBreak());
 
         }
     }
@@ -117,6 +126,7 @@ function addButtons(){
     scoreButton.innerText = "Score";
     scoreButton.id = "scoreButton";
     scoreButton.className = "scoreButton";
+    scoreButton.classList.add("buttonsToBeMoved");
     scoreButton.addEventListener('click', scoreButtonClick);
 
     var resetButton = document.createElement("button");
@@ -124,9 +134,10 @@ function addButtons(){
     resetButton.innerText = "Reset";
     resetButton.id = "resetButton";
     resetButton.className = "resetButton";
+    resetButton.classList.add("buttonsToBeMoved");
     resetButton.addEventListener('click', resetButtonClick);
 
-    document.getElementById("resetButton").insertAdjacentElement('afterend', document.createElement("br"));
+    document.getElementById("resetButton").insertAdjacentElement('afterend', createLineBreak());
 
     var manScoreButton = document.createElement("button");
     document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', manScoreButton);
@@ -134,6 +145,7 @@ function addButtons(){
     manScoreButton.id = "manScoreButton";
     manScoreButton.className = "resetButton";
     manScoreButton.classList.add("selectedButton");
+    manScoreButton.classList.add("buttonsToBeMoved");
     manScoreButton.addEventListener('click', autoScoreButtonClick);
 
     var autoScoreButton = document.createElement("button");
@@ -141,18 +153,65 @@ function addButtons(){
     autoScoreButton.innerText = "Automatic Scoring";
     autoScoreButton.id = "autoScoreButton";
     autoScoreButton.className = "resetButton";
+    autoScoreButton.classList.add("buttonsToBeMoved");
     autoScoreButton.addEventListener('click', autoScoreButtonClick);
 
-    document.getElementById("autoScoreButton").insertAdjacentElement('afterend', document.createElement("br"));
+    document.getElementById("autoScoreButton").insertAdjacentElement('afterend', createLineBreak());
 
     var resizeButton = document.createElement("button");
     document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', resizeButton);
     resizeButton.innerText = "Resize for iPad";
     resizeButton.id = "resizeButton";
     resizeButton.className = "resetButton";
+    resizeButton.classList.add("buttonsToBeMoved");
     resizeButton.addEventListener('click', resizeButtonClick);
 
+    var resizePhoneButton = document.createElement("button");
+    document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', resizePhoneButton);
+    resizePhoneButton.innerText = "Resize for iPhone";
+    resizePhoneButton.id = "resizePhoneButton";
+    resizePhoneButton.className = "resetButton";
+    resizePhoneButton.addEventListener('click', resizePhoneButtonClick);
+
     buttonsAdded = true;
+
+}
+
+function resizePhoneButtonClick(){
+    var buttons = document.getElementsByClassName("buttonsToBeMoved");
+    var playerButtons = document.getElementsByClassName("playerButton");
+    var lineBreaks = document.getElementsByClassName("settingsLineBreak");
+
+
+    for (lBreak of buttons){
+        document.getElementById("playerButtDiv").appendChild(lBreak);
+        lBreak.classList.add("phoneButton");
+    }
+
+    for (lBreak of playerButtons){
+        lBreak.classList.add("phoneButton");
+    }
+
+    for (lBreak of lineBreaks){
+        lBreak.remove();
+    }
+
+    var rowList = document.getElementById("gameBoard").rows;
+
+    phoneMode = true;
+
+    for (var row of rowList){
+        for (var cell of row.cells){
+            cell.classList.remove("gameBoardCell");
+            cell.classList.add("phoneGameBoardCell");
+        }
+    }
+
+    document.getElementById("autoScoreButton").innerText = "Auto Score";
+    document.getElementById("manScoreButton").innerText = "Man. Score";
+
+    document.getElementById("resizePhoneButton").remove();
+    document.getElementById("resizeButton").remove();
 
 }
 
@@ -169,6 +228,8 @@ function resizeButtonClick(){
     }
 
     document.getElementById("resizeButton").remove();
+    document.getElementById("resizePhoneButton").remove();
+
 
 }
 
@@ -189,6 +250,14 @@ function autoScoreButtonClick(passedMouseEvent){
 }
 
 function cellClick(passedMouseEvent){
+    try{
+        document.getElementById("resizePhoneButton").remove();
+        document.getElementById("resizeButton").remove();
+    } catch(err){
+
+    }
+
+
     console.log(passedMouseEvent);
     var clickedCell = passedMouseEvent.target;
 
