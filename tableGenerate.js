@@ -27,6 +27,8 @@ function createTable(){
             //thisCell.innerText = cellNo;
             thisCell.id = "cell".concat(cellNo);
             thisCell.setAttribute("cellId", cellNo);
+            thisCell.setAttribute("inHLine", "false");
+            thisCell.setAttribute("inVLine", "false");
             thisCell.classList.add("gameBoardCell")
             thisCell.addEventListener('click', cellClick);
             if (pinkCellList.includes(cellNo)){
@@ -216,15 +218,23 @@ function findHorizontalLines(){
         var hLineRowCells = [];
         for (var col = 0; col < 7; col++){
             if (tableRow.cells[col].getAttribute("occupiedBy") !== ""){
-                if (col !== 6){
+                if (0 < col && col < 6){
                     if (tableRow.cells[col].innerText === tableRow.cells[col+1].innerText || tableRow.cells[col].innerText === tableRow.cells[col-1].innerText){
-                        tableRow.cells[col].className = "hLineCell";
+                        tableRow.cells[col].classList.add("hLineCell");
                         hLineRowCells.push(parseInt(tableRow.cells[col].getAttribute("cellId")));
+                        tableRow.cells[col].setAttribute("inHLine", "true");
                     }
-                } else {
+                } else if (col > 5) {
                     if (tableRow.cells[col].innerText === tableRow.cells[col-1].innerText){
-                        tableRow.cells[col].className = "hLineCell";
+                        tableRow.cells[col].classList.add("hLineCell");
                         hLineRowCells.push(parseInt(tableRow.cells[col].getAttribute("cellId")));
+                        tableRow.cells[col].setAttribute("inHLine", "true");
+                    }
+                } else if (col < 1) {
+                    if (tableRow.cells[col].innerText === tableRow.cells[col+1].innerText){
+                        tableRow.cells[col].classList.add("hLineCell");
+                        hLineRowCells.push(parseInt(tableRow.cells[col].getAttribute("cellId")));
+                        tableRow.cells[col].setAttribute("inHLine", "true");
                     }
                 }
             }
@@ -233,6 +243,7 @@ function findHorizontalLines(){
             hLineCells.push(hLineRowCells);
         }
     }
+    console.log(hLineCells);
     return hLineCells;
 }
 
@@ -244,25 +255,40 @@ function findVerticalLines() {
         var vLineRowCells = [];
         for (var col = 0; col < 7; col++) {
             if (gameTable.rows[row].cells[col].getAttribute("occupiedBy") !== "") {
-                if (row !== 6) {
+                if (0 < row && row < 6) {
                     if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row + 1].cells[col].innerText || gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
-                        if (gameTable.rows[row].cells[col].className !== "hLineCell") {
-                            gameTable.rows[row].cells[col].className = "vLineCell";
+                        if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
+                            gameTable.rows[row].cells[col].classList.add("hvLineCell");
                         } else {
-                            gameTable.rows[row].cells[col].className = "hvLineCell";
+                            gameTable.rows[row].cells[col].classList.add("vLineCell");
                         }
                         vLineRowCells.push(parseInt(gameTable.rows[row].cells[col].getAttribute("cellId")));
+                        gameTable.rows[row].cells[col].setAttribute("inVLine", "true");
                     } else {
                         vLineRowCells.push("x");
                     }
-                } else {
+                } else if (row > 5) {
                     if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row - 1].cells[col].innerText) {
-                        if (gameTable.rows[row].cells[col].className !== "hLineCell") {
-                            gameTable.rows[row].cells[col].className = "vLineCell";
+                        if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
+                            gameTable.rows[row].cells[col].classList.add("hvLineCell");
                         } else {
-                            gameTable.rows[row].cells[col].className = "hvLineCell";
+                            gameTable.rows[row].cells[col].classList.add("vLineCell");
                         }
                         vLineRowCells.push(parseInt(gameTable.rows[row].cells[col].getAttribute("cellId")));
+                        gameTable.rows[row].cells[col].setAttribute("inVLine", "true");
+                    } else {
+                        vLineRowCells.push("x");
+
+                    }
+                } else if (row < 1) {
+                    if (gameTable.rows[row].cells[col].innerText === gameTable.rows[row + 1].cells[col].innerText) {
+                        if (gameTable.rows[row].cells[col].getAttribute("inHLine") === "true") {
+                            gameTable.rows[row].cells[col].classList.add("hvLineCell");
+                        } else {
+                            gameTable.rows[row].cells[col].classList.add("vLineCell");
+                        }
+                        vLineRowCells.push(parseInt(gameTable.rows[row].cells[col].getAttribute("cellId")));
+                        gameTable.rows[row].cells[col].setAttribute("inVLine", "true");
                     } else {
                         vLineRowCells.push("x");
 
@@ -289,9 +315,9 @@ function findIndividualSquares() {
     console.log("looking for individual squares");
     for (tableRow of document.getElementById("gameBoard").rows) {
         for (tableCell of tableRow.cells) {
-            if (tableCell.className !== "hLineCell" && tableCell.className !== "vLineCell" && tableCell.className !== "hvLineCell") {
+            if (tableCell.getAttribute("inHLine") === "false" && tableCell.getAttribute("inVLine") === "false") {
                 if (tableCell.getAttribute("occupiedBy") !== "") {
-                    tableCell.className = "indiCell";
+                    tableCell.classList.add("indiCell");
                     if (tableCell.getAttribute("occupiedBy") === "1") {
                         scores.player1Score = scores.player1Score + parseInt(tableCell.getAttribute("scoreValue"));
                     } else if (tableCell.getAttribute("occupiedBy") === "2") {
@@ -343,6 +369,7 @@ function processHlines(hLineArrays) {
 
 function processVLines(vLineArrays){
     var allLines = [];
+    console.log(vLineArrays);
     for (var i = 0; i < 7; i++){
         var currentLine = [];
         for (var i2 = 0; i2 < 7; i2++){
