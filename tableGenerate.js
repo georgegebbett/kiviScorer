@@ -13,6 +13,7 @@ var buttonsAdded = false;
 var scoreTableAdded = false;
 
 var autoScore = false;
+var ipadMode = false;
 
 document.body.onload = createTable;
 
@@ -37,7 +38,11 @@ function createTable(){
             thisCell.setAttribute("inVLine", "false");
             thisCell.setAttribute("inHVLine", "false");
 
-            thisCell.classList.add("gameBoardCell")
+            if (ipadMode){
+                thisCell.classList.add("iPadGameBoardCell");
+            } else {
+                thisCell.classList.add("gameBoardCell");
+            }
             thisCell.addEventListener('click', cellClick);
             if (pinkCellList.includes(cellNo)){
                 thisCell.classList.add("pink");
@@ -153,6 +158,8 @@ function addButtons(){
 
 function resizeButtonClick(){
     var rowList = document.getElementById("gameBoard").rows;
+
+    ipadMode = true;
 
     for (row of rowList){
         for (cell of row.cells){
