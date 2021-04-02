@@ -7,6 +7,8 @@ var selectedPlayer = 1;
 
 var player1Cells = 0;
 var player2Cells = 0;
+var player3Cells = 0;
+var player4Cells = 0;
 var cellLimit = 10;
 
 var buttonsAdded = false;
@@ -105,21 +107,20 @@ function addButtons(){
         return lineBreak;
     }
 
-    for (var i = 1; i <= numberOfPlayers; i++){
-        var playerButton = document.createElement("button");
-        var currentButton = document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', playerButton);
-        currentButton.innerText = "Player ".concat(i);
-        currentButton.id = "playerButton".concat(i);
-        currentButton.className = "playerButton";
-        currentButton.setAttribute("playerID", i);
-        currentButton.addEventListener('click', playerButtonClick);
-        if (i % 2 === 0){
-            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', createLineBreak());
-
+    for (var j = 2; j <= 4; j++){
+        var curPlayBut = document.createElement('button');
+        if (j === numberOfPlayers){
+            curPlayBut.classList.add('selectedButton');
         }
+        curPlayBut.innerText = j;
+        curPlayBut.classList.add('playSelButt');
+        curPlayBut.addEventListener('click', changePlayerNumbers);
+        document.getElementById('playerButtDiv').insertAdjacentElement('beforeend', curPlayBut);
     }
 
-    document.getElementById("playerButton".concat(selectedPlayer)).classList.add("selectedButton");
+    document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', createLineBreak());
+
+    createPlayerButtons();
 
     var scoreButton = document.createElement("button");
     document.getElementById("scoreButtDiv").insertAdjacentElement('beforeend', scoreButton);
@@ -175,6 +176,50 @@ function addButtons(){
 
     buttonsAdded = true;
 
+}
+
+function createPlayerButtons(){
+
+    var curButts = document.getElementsByClassName('playerButton');
+
+    while (curButts[0]){
+        curButts[0].parentNode.removeChild(curButts[0]);
+    }
+
+    function createLineBreak() {
+        var lineBreak = document.createElement("br");
+        lineBreak.className = "settingsLineBreak";
+        lineBreak.classList.add("playerButton");
+        return lineBreak;
+    }
+
+    console.log("creating player buttons, players: ".concat(numberOfPlayers));
+
+    for (var i = 1; i <= numberOfPlayers; i++){
+        var playerButton = document.createElement("button");
+        var currentButton = document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', playerButton);
+        currentButton.innerText = "Player ".concat(i);
+        currentButton.id = "playerButton".concat(i);
+        currentButton.className = "playerButton";
+        currentButton.setAttribute("playerID", i);
+        currentButton.addEventListener('click', playerButtonClick);
+        if (i % 2 === 0){
+            document.getElementById("playerButtDiv").insertAdjacentElement('beforeend', createLineBreak());
+
+        }
+    }
+
+    document.getElementById("playerButton".concat(selectedPlayer)).classList.add("selectedButton");
+}
+
+function changePlayerNumbers(mouseEvent) {
+    console.log('changing number of players to '.concat(mouseEvent.target.innerText));
+    for (button of document.getElementsByClassName('playSelButt')) {
+        button.classList.remove('selectedButton');
+    }
+    mouseEvent.target.classList.add('selectedButton');
+    numberOfPlayers = mouseEvent.target.innerText;
+    resetButtonClick();
 }
 
 function resizePhoneButtonClick(){
@@ -250,12 +295,19 @@ function autoScoreButtonClick(passedMouseEvent){
 }
 
 function cellClick(passedMouseEvent){
-    try{
-        document.getElementById("resizePhoneButton").remove();
-        document.getElementById("resizeButton").remove();
-    } catch(err){
+    for (button of document.getElementsByClassName('playSelButt')) {
+        button.disabled = true;
+    }
+
+    try {
+
+    document.getElementById("resizePhoneButton").remove();
+    document.getElementById("resizeButton").remove();
+
+    } catch(err) {
 
     }
+
 
 
     console.log(passedMouseEvent);
@@ -291,7 +343,7 @@ function cellClick(passedMouseEvent){
 
     if (autoScore){
 
-        var allRows = document.getElementById("gameBoard").rows
+        var allRows = document.getElementById("gameBoard").rows;
 
         for (row of allRows){
             for (cell of row.cells){
@@ -315,6 +367,7 @@ function cellClick(passedMouseEvent){
 
 function playerButtonClick(passedMouseEvent){
     selectedPlayer = passedMouseEvent.target.attributes.playerID.nodeValue;
+    console.log("selected player is now ".concat(selectedPlayer));
     for (button of document.getElementsByClassName("playerButton")){
         button.className = "playerButton";
         if (phoneMode){
@@ -373,6 +426,19 @@ function scoreButtonClick(){
     scoreTable.rows[3].cells[2].innerText = squareScores.player2Score;
     scoreTable.rows[4].cells[2].innerText = p2Score;
 
+    if (numberOfPlayers > 2){
+        scoreTable.rows[1].cells[3].innerText = hLineScores.player3Score;
+        scoreTable.rows[2].cells[3].innerText = vLineScores.player3Score;
+        scoreTable.rows[3].cells[3].innerText = squareScores.player3Score;
+        scoreTable.rows[4].cells[3].innerText = p3Score;
+        if (numberOfPlayers > 3){
+            scoreTable.rows[1].cells[4].innerText = hLineScores.player4Score;
+            scoreTable.rows[2].cells[4].innerText = vLineScores.player4Score;
+            scoreTable.rows[3].cells[4].innerText = squareScores.player4Score;
+            scoreTable.rows[4].cells[4].innerText = p4Score;
+        }
+    }
+
 
 
 
@@ -389,20 +455,24 @@ function resetButtonClick(){
         }
     }*/
 
-    var scoreTable = document.getElementById("scoreTable");
-    for (var i = 1; i < 5; i++){
-        for (var col = 1; col <= numberOfPlayers; col++){
-            scoreTable.rows[i].cells[col].innerText = "0";
-        }
+    for (button of document.getElementsByClassName('playSelButt')) {
+        button.disabled = false;
     }
+    document.getElementById("scoreTable").remove();
+    scoreTableAdded = false;
+
 
     document.getElementById("gameBoard").remove();
     createTable();
+    createPlayerButtons();
+
     document.getElementById("scoreTable").rows[0].cells[0].innerText = "";
 
 
     player1Cells = 0;
     player2Cells = 0;
+    player3Cells = 0;
+    player4Cells = 0;
 
 }
 
@@ -512,7 +582,7 @@ function findIndividualSquares() {
         player2Score: 0,
         player3Score: 0,
         player4Score: 0
-    }
+    };
     console.log("looking for individual squares");
     for (tableRow of document.getElementById("gameBoard").rows) {
         for (tableCell of tableRow.cells) {
